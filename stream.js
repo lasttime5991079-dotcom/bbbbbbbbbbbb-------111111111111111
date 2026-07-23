@@ -1130,6 +1130,10 @@ backupBrowserName = brokenName;
 }
 
 async function startDirectStreaming() {
+    // 👇=== YEH 2 LINES SHURU MEIN ADD KAREIN ===👇
+    activeBrowserName = "CHROME 1";
+    backupBrowserName = "CHROME 2";
+    
     console.log(`[*] Starting OBS Studio FIRST...`);
     setupOBSConfig();
 
