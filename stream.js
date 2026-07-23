@@ -130,6 +130,10 @@ const ACTIVE_STREAM_KEY = STREAM_KEYS[SELECTED_CHANNEL] || STREAM_KEYS['1'];
 let activeBrowser = null;
 let backupBrowser = null;
 
+// Name tags for tracking
+let activeBrowserName = "CHROME 1";
+let backupBrowserName = "CHROME 2";
+
 let obsProcess = null;
 let activePage = null;
 let backupPage = null;
@@ -998,10 +1002,10 @@ async function startWatchdog() {
             let nextAfterBackupUrl = urlList[nextAfterBackupIndex];
             
             console.log(`\n==================================================`);
-            console.log(`[💓] ACTIVE HEARTBEAT (CHROME 1): Status is ${activeStatus.status} | Video Time: ${activeStatus.currentTime ? activeStatus.currentTime.toFixed(1) + 's' : 'N/A'}`);
-            console.log(`[▶️] CURRENTLY LIVE             : Server [${currentUrlIndex}] (Audio ON) -> ${activeUrlStr}`);
-            console.log(`--------------------------------------------------`);
-            console.log(`[🖤] BACKUP HEARTBEAT (CHROME 2): Status is ${logBackupStatus.status} | Video Time: ${logBackupStatus.currentTime ? logBackupStatus.currentTime.toFixed(1) + 's' : 'N/A'}`);
+            console.log(`[💓] ACTIVE HEARTBEAT (${activeBrowserName}): Status is ${activeStatus.status} | Video Time: ${activeStatus.currentTime ? activeStatus.currentTime.toFixed(1) + 's' : 'N/A'}`);
+console.log(`[▶️] CURRENTLY LIVE             : Server [${currentUrlIndex}] (Audio ON) -> ${activeUrlStr}`);
+console.log(`--------------------------------------------------`);
+console.log(`[🖤] BACKUP HEARTBEAT (${backupBrowserName}): Status is ${logBackupStatus.status} | Video Time: ${logBackupStatus.currentTime ? logBackupStatus.currentTime.toFixed(1) + 's' : 'N/A'}`);
             console.log(`[🔄] RUNNING IN BACKGROUND      : Server [${backupUrlIndex}] (Audio MUTED) -> ${backupUrlStr}`);
             console.log(`[⏭️] NEXT QUEUE (AFTER BACKUP)  : Server [${nextAfterBackupIndex}] -> ${nextAfterBackupUrl}`);
             console.log(`==================================================\n`);
@@ -1078,6 +1082,13 @@ backupPage = brokenPage;
 let brokenBrowser = activeBrowser; 
 activeBrowser = backupBrowser; 
 backupBrowser = brokenBrowser;
+
+
+// Swap Names taake pata chale screen par konsa aya hai
+let brokenName = activeBrowserName;
+activeBrowserName = backupBrowserName;
+backupBrowserName = brokenName;
+                
                 lastActiveTime = -1; frozenCheckTimestamp = Date.now();
                 isRecoveryUIShown = false; // 🔥 Fresh slate for new active tab
 
