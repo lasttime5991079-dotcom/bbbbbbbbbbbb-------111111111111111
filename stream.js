@@ -1,5 +1,5 @@
 
-const puppeteer = require('puppeteer-extra');
+const puppeteer = require('puppeteer-extra');let isWarmupPhase = true;
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
 
@@ -862,6 +862,7 @@ async function startWatchdog() {
     
     let streamSetupTime = Date.now(); 
     let isWarmupPhase = true; 
+    let backupWarmupTime = Date.now(); // 👈 YEH NAYI LINE ADD KAREIN
     const WARMUP_MAX_TIME = 15000; 
 
     let activeUrlStr = urlList[currentUrlIndex];
@@ -879,8 +880,8 @@ async function startWatchdog() {
 
         let activeStatus = await checkPageStatus(activePage);
 
-        // 👇=== YAHAN SE NAYA CODE PASTE KAREIN ===👇
-        if (!isWarmupPhase) {
+// 👇=== UPDATED BACKGROUND SHIELD CODE ===👇
+        if (!isWarmupPhase && (Date.now() - backupWarmupTime > 30000)) { // 👈 30 seconds ka cooldown add kiya
             let backupStatus = await checkPageStatus(backupPage);
             
             // Agar backup background mein hang hai ya error de raha hai
@@ -892,6 +893,8 @@ async function startWatchdog() {
                 backupUrlStr = urlList[backupUrlIndex];
                 
                 console.log(`[*] Shifting Backup Chrome to NEXT link -> Server [${backupUrlIndex}]`);
+                
+                backupWarmupTime = Date.now(); // 👈 COOLDOWN RESET (Taake agli dafa 30 sec wait kare)
                 
                 // Backup browser ko silently naye link par bhej dein
                 try {
@@ -908,8 +911,7 @@ async function startWatchdog() {
                 } catch(e) {}
             }
         }
-        // 👆=== YAHAN NAYA CODE KHATAM HOGA ===👆
-
+        // 👆=== UPDATED CODE END ===👆
         
 
         if (activeStatus.status === 'HEALTHY' && !isWarmupPhase) {
