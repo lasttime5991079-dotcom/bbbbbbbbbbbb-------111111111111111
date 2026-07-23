@@ -872,7 +872,9 @@ async function startWatchdog() {
     let isRecoveryUIShown = false;
 
     while (true) {
-        if (!browser || !browser.isConnected()) throw new Error("Browser closed.");
+        if (!activeBrowser || !activeBrowser.isConnected() || !backupBrowser || !backupBrowser.isConnected()) {
+            throw new Error("One or both browser instances disconnected.");
+        }
 
         let activeStatus = await checkPageStatus(activePage);
 
@@ -1222,20 +1224,15 @@ async function mainLoop() {
 async function cleanup() {
     console.log('[*] Cleaning up resources...');
     try { await obs.disconnect(); } catch (e) { } 
-    if (activeBrowser) { 
-    try { await activeBrowser.close(); } catch(e) { } 
-    activeBrowser = null; 
-}
-if (backupBrowser) { 
-    try { await backupBrowser.close(); } catch(e) { } 
-    backupBrowser = null; 
-}
-    if (obsProcess) { try { obsProcess.kill('SIGKILL'); } catch(e) { } obsProcess = null; }
-    try {
-        execSync('pkill -9 obs || true', { stdio: 'ignore' });
-        execSync('pkill -9 chrome || true', { stdio: 'ignore' });
-        execSync('pkill -9 puppeteer || true', { stdio: 'ignore' });
-    } catch (e) { }
+    if (activeBrowser) { try { await activeBrowser.close(); } catch(e) { } activeBrowser = null; }
+    if (backupBrowser) { try { await backupBrowser.close(); } catch(e) { } backupBrowser = null; }
+    
+        if (obsProcess) { try { obsProcess.kill('SIGKILL'); } catch(e) { } obsProcess = null; }
+        try {
+            execSync('pkill -9 obs || true', { stdio: 'ignore' });
+            execSync('pkill -9 chrome || true', { stdio: 'ignore' });
+            execSync('pkill -9 puppeteer || true', { stdio: 'ignore' });
+        } catch (e) { }
 }
 
 process.on('SIGINT', async () => { await cleanup(); process.exit(0); });
